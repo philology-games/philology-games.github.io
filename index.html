@@ -140,14 +140,14 @@ function render(){
         displayTitle = "Капитанская<br>дочка";
       }
       var titleForSpine = b.title;
-if (b.title === "Капитанская дочка") {
-  titleForSpine = "Капитанская<br>дочка";
-} else if (b.title === "Евгений Онегин") {
+if (b.title === "Евгений Онегин") {
   titleForSpine = "Евгений<br>Онегин";
 } else if (b.title === "Герой нашего времени") {
   titleForSpine = "Герой<br>нашего<br>времени";
 } else if (b.title === "Мёртвые души") {
   titleForSpine = "Мёртвые<br>души";
+} else if (b.title === "Капитанская дочка") {
+  titleForSpine = "Капитанская<br>дочка";
 }
 card.innerHTML = '<span class="title">' + titleForSpine + '</span>';
     } else {
