@@ -14,25 +14,12 @@ h1{text-align:center;color:#3e2e1a;margin-bottom:8px;font-size:1.8rem}
 .books{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;padding:8px;background:rgba(160,120,80,0.1);border-radius:12px;border-bottom:3px solid #8a6a44;min-height:100px;align-items:flex-end}
 .book{flex:0 1 auto;min-width:80px;max-width:160px;padding:10px;background:linear-gradient(145deg,#f0e4ce,#dccdb2);border:1px solid #b5956a;border-radius:10px;text-align:center;cursor:pointer;box-shadow:0 3px 0 #b5956a;transition:all 0.2s}
 .book .author{font-size:.65rem;text-transform:uppercase;color:#4c351b;display:block}
-.book .title{font-size:.9rem;font-weight:700;word-break:keep-all;line-height:1.2;display:block}
+.book .title{font-size:.9rem;font-weight:700;word-break:break-word;line-height:1.2;display:block}
 .book .counter{background:#b39162;color:#fff;padding:1px 8px;border-radius:30px;display:inline-block;margin-top:4px;font-size:.7rem}
 .book.done{min-width:34px;max-width:50px;height:100px;padding:0;background:linear-gradient(to right, #3f2c16 0%, #5a3d24 8%, #7a5b3a 20%, #6b4d2d 100%);border:1px solid #2d1a0a;border-radius:2px 6px 6px 2px;cursor:default;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;box-shadow:2px 0 4px rgba(0,0,0,0.2), -1px 0 0 rgba(255,255,255,0.1)}
 .book.done::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 100%);border-radius:2px 6px 6px 2px;pointer-events:none}
 .book.done::after{content:'';position:absolute;top:12%;left:4px;width:2px;height:76%;background:rgba(255,255,255,0.08);border-radius:1px}
-.book.done .title {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #f0e0c8;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  letter-spacing: 1px;
-  padding: 4px 0;
-  z-index: 1;
-  white-space: nowrap;
-  line-height: 1.2;
-}
+.book.done .title{font-size:.65rem;font-weight:700;color:#f0e0c8;text-shadow:0 1px 2px rgba(0,0,0,0.6);writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);letter-spacing:1px;padding:4px 0;z-index:1;word-break:break-word;line-height:1.2}
 .final{margin-top:16px;display:none;text-align:center}
 .final.show{display:block}
 .final h2{font-size:2.8rem;color:#7a2e2e;margin-bottom:6px}
@@ -68,7 +55,7 @@ var booksData = [
 {author:"Д. И. Фонвизин", title:"Недоросль", chars:["Митрофанушка Простаков","госпожа Простакова","Тарас Скотинин","Стародум","Софья","Цыфиркин","Кутейкин","Вральман","Правдин","Милон"]},
 {author:"А. С. Грибоедов", title:"Горе от ума", chars:["Павел Афанасьевич Фамусов","Александр Андреевич Чацкий","Алексей Степанович Молчалин","Сергей Сергеевич Скалозуб","Софья Фамусова","Лизанька","Платон Михайлович Горич","князь и княгиня Тугоуховские","Репетилов","Хлёстова"]},
 {author:"А. С. Пушкин", title:"Евгений Онегин", chars:["Евгений Онегин","Владимир Ленский","Татьяна Ларина","Ольга Ларина","Прасковья Ларина","Автор","князь N","няня Филипьевна","Зарецкий","княжна Алина"]},
-{author:"А. С. Пушкин", title:"Капитанская<br>дочка", chars:["Пётр Гринёв","Савельич","Алексей Швабрин","Емельян Пугачёв","Екатерина II","Маша Миронова","Иван Кузьмич Миронов","Василиса Егоровна","Андрей Карлович Р.","Зурин"]},
+{author:"А. С. Пушкин", title:"Капитанская дочка", chars:["Пётр Гринёв","Савельич","Алексей Швабрин","Емельян Пугачёв","Екатерина II","Маша Миронова","Иван Кузьмич Миронов","Василиса Егоровна","Андрей Карлович Р.","Зурин"]},
 {author:"М. Ю. Лермонтов", title:"Герой нашего времени", chars:["Григорий Александрович Печорин","Максим Максимыч","Бэла","Грушницкий","Вернер","Вулич","Казбич","Вера","Азамат","Мери Лиговская"]},
 {author:"Н. В. Гоголь", title:"Ревизор", chars:["Иван Александрович Хлестаков","Осип","Антон Антонович Сквозник-Дмухановский","Аммос Фёдорович Ляпкин-Тяпкин","Артемий Филиппович Земляника","Лука Лукич Хлопов","Христиан Иванович Гибнер","Бобчинский и Добчинский","Марья Антоновна","Анна Андреевна"]},
 {author:"Н. В. Гоголь", title:"Мёртвые души", chars:["Павел Иванович Чичиков","Манилов","Фемистоклюс","Алкид","Настасья Петровна Коробочка","Ноздрёв","Михаил Семёнович Собакевич","Степан Плюшкин","Селифан","капитан Копейкин"]},
@@ -129,26 +116,24 @@ function render(){
   state.books.forEach(function(b, i){
     var card = document.createElement('div');
     card.className = 'book' + (b.done ? ' done' : '');
-    if (b.done) {
-  var color = b.color;
-  var darkColor = adjustColor(color, -40);
-  var lightColor = adjustColor(color, 30);
-  card.style.background = 'linear-gradient(to right, ' + darkColor + ' 0%, ' + color + ' 15%, ' + lightColor + ' 35%, ' + color + ' 55%, ' + darkColor + ' 85%, ' + darkColor + ' 100%)';
-  card.style.borderColor = darkColor;
-  
-  // Ручные переносы для длинных названий
-  var titleForSpine = b.title;
-  if (b.title === "Евгений Онегин") {
-    titleForSpine = "Евгений<br>Онегин";
-  } else if (b.title === "Герой нашего времени") {
-    titleForSpine = "Герой<br>нашего<br>времени";
-  } else if (b.title === "Мёртвые души") {
-    titleForSpine = "Мёртвые<br>души";
-  } else if (b.title === "Капитанская дочка") {
-    titleForSpine = "Капитанская<br>дочка";
-  }
-  card.innerHTML = '<span class="title">' + titleForSpine + '</span>';
-}
+    if(b.done){
+      var color = b.color;
+      var darkColor = adjustColor(color, -40);
+      var lightColor = adjustColor(color, 30);
+      card.style.background = 'linear-gradient(to right, ' + darkColor + ' 0%, ' + color + ' 15%, ' + lightColor + ' 35%, ' + color + ' 55%, ' + darkColor + ' 85%, ' + darkColor + ' 100%)';
+      card.style.borderColor = darkColor;
+      
+      var titleForSpine = b.title;
+      if (b.title === "Евгений Онегин") {
+        titleForSpine = "Евгений<br>Онегин";
+      } else if (b.title === "Герой нашего времени") {
+        titleForSpine = "Герой<br>нашего<br>времени";
+      } else if (b.title === "Мёртвые души") {
+        titleForSpine = "Мёртвые<br>души";
+      } else if (b.title === "Капитанская дочка") {
+        titleForSpine = "Капитанская<br>дочка";
+      }
+      card.innerHTML = '<span class="title">' + titleForSpine + '</span>';
     } else {
       card.innerHTML = '<span class="author">' + b.author + '</span><span class="title">' + b.title + '</span><br><span class="counter">' + b.collected + '/' + b.chars.length + '</span>';
       card.dataset.idx = i;
