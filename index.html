@@ -123,7 +123,11 @@ function render(){
       var lightColor = adjustColor(color, 30);
       card.style.background = 'linear-gradient(to right, ' + darkColor + ' 0%, ' + color + ' 15%, ' + lightColor + ' 35%, ' + color + ' 55%, ' + darkColor + ' 85%, ' + darkColor + ' 100%)';
       card.style.borderColor = darkColor;
-      card.innerHTML = '<span class="title">' + b.title.replace(/\n/g, '<br>');
+      var displayTitle = b.title;
+if (b.title === "Капитанская дочка") {
+  displayTitle = "Капитанская<br>дочка";
+}
+card.innerHTML = '<span class="title">' + displayTitle + '</span>';
     } else {
       card.innerHTML = '<span class="author">' + b.author + '</span><span class="title">' + b.title + '</span><br><span class="counter">' + b.collected + '/' + b.chars.length + '</span>';
       card.dataset.idx = i;
