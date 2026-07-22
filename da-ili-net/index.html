@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Верю — Не верю</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ----- общие стили ----- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: #f5f0eb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+      position: relative;
+    }
+    /* Фон с нарисованной библиотекой (CSS-имитация) */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background:
+        repeating-linear-gradient(
+          180deg,
+          transparent 0px,
+          transparent 70px,
+          #8b6b4d 70px,
+          #8b6b4d 72px,
+          transparent 72px,
+          transparent 140px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px,
+          transparent 120px,
+          #8b6b4d 120px,
+          #8b6b4d 122px,
+          transparent 122px,
+          transparent 240px
+        );
+      background-size: 100% 100%, 100% 100%;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .game-container {
+      position: relative;
+      background: rgba(245, 240, 235, 0.85);
+      border-radius: 48px;
+      padding: 30px 40px 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      max-width: 1000px;
+      width: 100%;
+      z-index: 1;
+      backdrop-filter: blur(2px);
+    }
+    .watermark {
+      position: absolute;
+      bottom: 12px;
+      right: 20px;
+      font-size: 0.85rem;
+      color: rgba(0,0,0,0.12);
+      font-family: 'Segoe UI', sans-serif;
+      pointer-events: none;
+      z-index: 10;
+      letter-spacing: 0.5px;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .sound-panel {
+      display: flex;
+      gap: 20px;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+    .sound-btn {
+      background: rgba(255,255,255,0.7);
+      border: none;
+      border-radius: 40px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sound-btn:hover { background: #fff; }
+    .sound-btn.off { opacity: 0.5; }
+
+    .table {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 20px;
+      min-height: 400px;
+    }
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+    }
+    .column-label {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      opacity: 0.6;
+    }
+    .stack {
+      width: 100%;
+      min-height: 300px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .stack-center {
+      background: rgba(255,255,240,0.5);
+      border: 2px dashed rgba(0,0,0,0.1);
+    }
+    .card {
+      background: #fffaf5;
+      border-radius: 20px;
+      padding: 24px 20px 30px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: default;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .card .question {
+      font-family: 'Caveat', cursive;
+      font-size: 1.7rem;
+      font-weight: 700;
+      text-align: center;
+      color: #2d2d2d;
+      line-height: 1.4;
+      width: 100%;
+      padding: 0 4px;
+    }
+    .card .options {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 30px;
+      margin-top: 8px;
+    }
+    .card .option-btn {
+      flex: 1;
+      padding: 12px 8px;
+      border: 2px solid #b0a090;
+      border-radius: 40px;
+      background: #f5efe8;
+      font-size: 1.6rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      text-align: center;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      letter-spacing: 0.5px;
+      color: #2d2d2d;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card .option-btn:hover {
+      background: #e8dfd6;
+      transform: scale(1.02);
+    }
+    .card .option-btn.correct {
+      background: #8bc34a;
+      border-color: #558b2f;
+      color: white;
+      pointer-events: none;
+    }
+    .card .option-btn.wrong {
+      background: #e57373;
+      border-color: #b71c1c;
+      color: white;
+      pointer-events: none;
+    }
+    .card .option-btn:active {
+      transform: scale(0.95);
+    }
+    .card .option-btn.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .scroll {
+      display: none;
+      margin-top: 10px;
+      padding: 16px 18px;
+      background: #fef7e9;
+      border-radius: 12px;
+      border-left: 6px solid #b8860b;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #3d3d3d;
+      text-align: left;
+      width: 100%;
+      position: relative;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    .scroll.show {
+      display: block;
+      animation: fadeSlide 0.4s ease;
+    }
+    @keyframes fadeSlide {
+      0% { opacity: 0; transform: translateY(-10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .scroll .close-scroll {
+      background: none;
+      border: none;
+      color: #8b6b4d;
+      font-size: 1.2rem;
+      cursor: pointer;
+      float: right;
+      margin-top: -6px;
+      font-weight: bold;
+    }
+    .scroll .close-scroll:hover { color: #4a3a2a; }
+
+    .error-counter {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-top: 12px;
+      color: #5d4037;
+    }
+    .error-counter span {
+      background: rgba(0,0,0,0.05);
+      padding: 4px 14px;
+      border-radius: 30px;
+    }
+
+    .final-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 999;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .final-screen .final-title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      margin-bottom: 10px;
+    }
+    .final-screen .final-emoji {
+      font-size: 5rem;
+      margin: 10px 0 20px;
+    }
+    .final-screen .final-sub {
+      font-size: 1.5rem;
+      opacity: 0.9;
+    }
+    .final-screen .final-btn {
+      margin-top: 30px;
+      padding: 12px 40px;
+      font-size: 1.6rem;
+      background: #8b6b4d;
+      border: none;
+      border-radius: 60px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      transition: 0.2s;
+    }
+    .final-screen .final-btn:hover {
+      background: #6d4c38;
+      transform: scale(1.05);
+    }
+
+    .flying {
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: fixed;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .hidden { display: none !important; }
+    .count-badge {
+      font-size: 1.2rem;
+      background: rgba(0,0,0,0.05);
+      padding: 4px 14px;
+      border-radius: 30px;
+      margin-top: 8px;
+    }
+    .reset-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.7rem;
+      color: #999;
+      cursor: pointer;
+      opacity: 0.4;
+    }
+    .reset-btn:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div class="game-container" id="app">
+  <div class="watermark">&copy; Анна Сазонова, 2006</div>
+
+  <div class="sound-panel">
+    <button class="sound-btn" id="musicToggle">🎵 Музыка</button>
+    <button class="sound-btn" id="sfxToggle">🔊 Звуки</button>
+  </div>
+
+  <div class="table" id="gameTable">
+    <div class="column">
+      <div class="column-label">❌</div>
+      <div class="stack" id="wrongStack"></div>
+    </div>
+    <div class="column">
+      <div class="column-label">📖</div>
+      <div class="stack stack-center" id="centerStack">
+        <div id="cardContainer" style="width:100%; display:flex; justify-content:center;"></div>
+        <div class="count-badge" id="centerCount">0</div>
+        <div class="error-counter" id="errorCounter"><span>0 / <span id="totalQuestions">0</span></span></div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="column-label">✅</div>
+      <div class="stack" id="rightStack"></div>
+    </div>
+  </div>
+
+  <button class="reset-btn" id="resetBtn">Сбросить прогресс</button>
+</div>
+
+<!-- финальный экран -->
+<div class="final-screen" id="finalScreen">
+  <div class="final-title" id="finalTitle"></div>
+  <div class="final-emoji" id="finalEmoji"></div>
+  <div class="final-sub" id="finalSub"></div>
+  <button class="final-btn" id="restartBtn">Играть снова</button>
+</div>
+
+<!-- подключаем внешний файл с вопросами -->
+<script src="data.js"></script>
+
+<!-- основной скрипт -->
+<script>
+  // ============================================================
+  // 1. ЗВУКИ
+  // ============================================================
+  let audioCtx = null;
+  function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function playCrack() {
+    if (!sfxEnabled) return;
+    try {
+      initAudio();
+      const bufferSize = audioCtx.sampleRate * 0.08;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+      }
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.15;
+      source.connect(gain);
+      gain.connect(audioCtx.destination);
+      source.start();
+    } catch(e) {}
+  }
+
+  function playClick() {
+    if (!sfxEnabled) return;
+    try {
+      initAudio();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 800;
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    } catch(e) {}
+  }
+
+  function playApplause() {
+    if (!sfxEnabled) return;
+    try {
+      initAudio();
+      for (let i = 0; i < 12; i++) {
+        setTimeout(() => {
+          const bufferSize = audioCtx.sampleRate * 0.04;
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let j = 0; j < bufferSize; j++) {
+            data[j] = (Math.random() * 2 - 1) * (1 - j / bufferSize);
+          }
+          const source = audioCtx.createBufferSource();
+          source.buffer = buffer;
+          const gain = audioCtx.createGain();
+          gain.gain.value = 0.08;
+          source.connect(gain);
+          gain.connect(audioCtx.destination);
+          source.start();
+        }, i * 80);
+      }
+    } catch(e) {}
+  }
+
+  // ============================================================
+  // 2. МУЗЫКА (спокойная классика)
+  // ============================================================
+  const NOTES = {
+    'C4':261.63,'E4':329.63,'G4':392.00,'C5':523.25,
+    'D4':293.66,'F4':349.23,'A4':440.00,'D5':587.33,
+    'E4':329.63,'G4':392.00,'B4':493.88,'E5':659.25,
+    'F4':349.23,'A4':440.00,'C5':523.25,'F5':698.46,
+    'G4':392.00,'B4':493.88,'D5':587.33,'G5':783.99,
+    'A4':440.00,'C5':523.25,'E5':659.25,'A5':880.00,
+    'B4':493.88,'D5':587.33,'F5':698.46,'B5':987.77
+  };
+  const chords = [
+    ['C4','E4','G4','C5'],
+    ['F4','A4','C5','F5'],
+    ['G4','B4','D5','G5'],
+    ['C5','E5','G5','C6']
+  ];
+  const melodyNotes = ['C4','E4','G4','C5','B4','G4','E4','C4',
+                       'F4','A4','C5','F5','E5','C5','A4','F4',
+                       'G4','B4','D5','G5','F5','D5','B4','G4',
+                       'C5','E5','G5','C6','B5','G5','E5','C5'];
+
+  let musicSource = null, musicGain = null, musicBuffer = null;
+
+  function generateMusicBuffer(durationSec = 10) {
+    initAudio();
+    const sampleRate = audioCtx.sampleRate;
+    const length = Math.floor(sampleRate * durationSec);
+    const buffer = audioCtx.createBuffer(2, length, sampleRate);
+    const left = buffer.getChannelData(0);
+    const right = buffer.getChannelData(1);
+    const chordFreqs = chords.map(acc => acc.map(n => NOTES[n]));
+    const melodyFreqs = melodyNotes.map(n => NOTES[n]);
+    const noteDur = 0.2;
+    const samplesPerNote = Math.floor(sampleRate * noteDur);
+    let time = 0, chordIdx = 0, noteIdx = 0, melIdx = 0;
+    while (time < length) {
+      const currentChord = chordFreqs[chordIdx % chordFreqs.length];
+      const freq1 = currentChord[noteIdx % currentChord.length];
+      const freq2 = melodyFreqs[melIdx % melodyFreqs.length];
+      for (let i = 0; i < samplesPerNote && time < length; i++, time++) {
+        const t = i / samplesPerNote;
+        const env = Math.sin(t * Math.PI) * 0.6;
+        let val1 = (t * 2 - 1) * 0.3 * env;
+        let val2 = Math.sin(2 * Math.PI * freq2 * t) * 0.25 * env;
+        const mixed = val1 + val2;
+        left[time] = mixed * 0.4;
+        right[time] = mixed * 0.4;
+      }
+      noteIdx = (noteIdx + 1) % currentChord.length;
+      if (noteIdx === 0) chordIdx++;
+      melIdx = (melIdx + 1) % melodyFreqs.length;
+    }
+    return buffer;
+  }
+
+  function startMusic() {
+    if (!musicEnabled) return;
+    try {
+      initAudio();
+      if (!musicBuffer) musicBuffer = generateMusicBuffer(10);
+      if (musicSource) {
+        try { musicSource.stop(); } catch(e) {}
+        musicSource.disconnect();
+      }
+      musicSource = audioCtx.createBufferSource();
+      musicSource.buffer = musicBuffer;
+      musicSource.loop = true;
+      musicGain = audioCtx.createGain();
+      musicGain.gain.value = 0.2;
+      musicSource.connect(musicGain);
+      musicGain.connect(audioCtx.destination);
+      musicSource.start();
+    } catch(e) { console.warn('Music error:', e); }
+  }
+
+  function stopMusic() {
+    if (musicSource) {
+      try { musicSource.stop(); } catch(e) {}
+      musicSource.disconnect();
+      musicSource = null;
+    }
+  }
+
+  // ============================================================
+  // 3. ИГРОВАЯ ЛОГИКА
+  // ============================================================
+  let questions = [];
+  let currentQuestions = [];
+  let centerStack = [];
+  let wrongStack = [];
+  let rightStack = [];
+  let errorCount = 0;
+  let totalQuestions = 0;
+  let isAnimating = false;
+  let currentCardIdx = null;
+  let answered = false;
+
+  const cardContainer = document.getElementById('cardContainer');
+  const centerCount = document.getElementById('centerCount');
+  const wrongStackEl = document.getElementById('wrongStack');
+  const rightStackEl = document.getElementById('rightStack');
+  const errorCounterSpan = document.getElementById('errorCounter').querySelector('span');
+  const totalQuestionsSpan = document.getElementById('totalQuestions');
+  const finalScreen = document.getElementById('finalScreen');
+  const finalTitle = document.getElementById('finalTitle');
+  const finalEmoji = document.getElementById('finalEmoji');
+  const finalSub = document.getElementById('finalSub');
+  const restartBtn = document.getElementById('restartBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const gameTable = document.getElementById('gameTable');
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function initGame() {
+    if (typeof questions === 'undefined' || !questions.length) {
+      alert('Ошибка: файл data.js не найден или не содержит вопросов.');
+      return;
+    }
+    currentQuestions = questions.slice();
+    shuffle(currentQuestions);
+    totalQuestions = currentQuestions.length;
+    totalQuestionsSpan.textContent = totalQuestions;
+    centerStack = currentQuestions.map((_, i) => i);
+    wrongStack = [];
+    rightStack = [];
+    errorCount = 0;
+    answered = false;
+    updateErrorCounter();
+    renderStacks();
+    finalScreen.style.display = 'none';
+    gameTable.style.display = 'flex';
+    showNextCard();
+    if (musicEnabled) startMusic();
+  }
+
+  function updateErrorCounter() {
+    errorCounterSpan.innerHTML = `${errorCount} / ${totalQuestions}`;
+  }
+
+  function renderStacks() {
+    wrongStackEl.innerHTML = `<div style="font-size:2rem; opacity:0.3;">${wrongStack.length}</div>`;
+    rightStackEl.innerHTML = `<div style="font-size:2rem; opacity:0.3;">${rightStack.length}</div>`;
+    centerCount.textContent = centerStack.length;
+  }
+
+  function showNextCard() {
+    if (centerStack.length === 0) {
+      cardContainer.innerHTML = '';
+      showFinal();
+      return;
+    }
+    const idx = centerStack.shift();
+    currentCardIdx = idx;
+    const q = currentQuestions[idx];
+    renderStacks();
+    answered = false;
+
+    cardContainer.innerHTML = '';
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'card';
+    cardDiv.dataset.idx = idx;
+
+    const qText = document.createElement('div');
+    qText.className = 'question';
+    qText.textContent = q.question;
+    cardDiv.appendChild(qText);
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'options';
+
+    const btnTrue = document.createElement('div');
+    btnTrue.className = 'option-btn';
+    btnTrue.textContent = 'Верю';
+    btnTrue.dataset.value = 'true';
+
+    const btnFalse = document.createElement('div');
+    btnFalse.className = 'option-btn';
+    btnFalse.textContent = 'Не верю';
+    btnFalse.dataset.value = 'false';
+
+    const handleOptionClick = (e) => {
+      if (answered || isAnimating) return;
+      const target = e.currentTarget;
+      const selected = target.dataset.value === 'true';
+      const correct = q.correct;
+      playClick();
+
+      if (selected === correct) {
+        target.classList.add('correct');
+        moveCard(idx, 'right');
+        answered = true;
+      } else {
+        target.classList.add('wrong');
+        errorCount++;
+        updateErrorCounter();
+        showScroll(cardDiv, q.explanation);
+        moveCard(idx, 'wrong');
+        answered = true;
+      }
+    };
+
+    btnTrue.addEventListener('click', handleOptionClick);
+    btnFalse.addEventListener('click', handleOptionClick);
+    optionsDiv.appendChild(btnTrue);
+    optionsDiv.appendChild(btnFalse);
+    cardDiv.appendChild(optionsDiv);
+
+    const scrollDiv = document.createElement('div');
+    scrollDiv.className = 'scroll';
+    scrollDiv.id = 'scrollContainer';
+    cardDiv.appendChild(scrollDiv);
+
+    cardContainer.appendChild(cardDiv);
+  }
+
+  function showScroll(cardEl, explanation) {
+    const scroll = cardEl.querySelector('.scroll');
+    if (!scroll) return;
+    scroll.innerHTML = `
+      <button class="close-scroll" id="closeScrollBtn">✕</button>
+      <div style="margin-top: 6px;">${explanation}</div>
+    `;
+    scroll.classList.add('show');
+    const closeBtn = scroll.querySelector('#closeScrollBtn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        scroll.classList.remove('show');
+      });
+    }
+  }
+
+  function moveCard(idx, target) {
+    isAnimating = true;
+    playCrack();
+
+    if (target === 'right') {
+      rightStack.push(idx);
+    } else {
+      wrongStack.push(idx);
+    }
+    renderStacks();
+
+    const cardEl = cardContainer.querySelector('.card');
+    if (cardEl) {
+      const rect = cardEl.getBoundingClientRect();
+      const clone = cardEl.cloneNode(true);
+      clone.className = 'card flying';
+      clone.style.left = rect.left + 'px';
+      clone.style.top = rect.top + 'px';
+      clone.style.width = rect.width + 'px';
+      clone.style.height = rect.height + 'px';
+      document.body.appendChild(clone);
+
+      const targetStack = (target === 'right') ? rightStackEl : wrongStackEl;
+      const targetRect = targetStack.getBoundingClientRect();
+      const dx = targetRect.left + targetRect.width/2 - rect.left - rect.width/2;
+      const dy = targetRect.top + targetRect.height/2 - rect.top - rect.height/2;
+      requestAnimationFrame(() => {
+        clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.85)`;
+        clone.style.opacity = '0.6';
+      });
+      setTimeout(() => {
+        clone.remove();
+        cardEl.remove();
+        isAnimating = false;
+        showNextCard();
+      }, 400);
+    } else {
+      isAnimating = false;
+      showNextCard();
+    }
+  }
+
+  // ============================================================
+  // 4. ФИНАЛ
+  // ============================================================
+  function showFinal() {
+    gameTable.style.display = 'none';
+    finalScreen.style.display = 'flex';
+    let title, emoji, sub;
+    if (errorCount === 0) {
+      title = 'Вы настоящий знаток!';
+      emoji = '🏆';
+      sub = 'Блестящий результат!';
+      playApplause();
+    } else if (errorCount <= 3) {
+      title = 'Хороший результат!';
+      emoji = '👍';
+      sub = 'Вы хорошо знаете литературу.';
+      playApplause();
+    } else if (errorCount <= 9) {
+      title = 'Вы старались!';
+      emoji = '💐';
+      sub = 'Повторите материал и попробуйте снова.';
+    } else {
+      title = 'Есть к чему стремиться';
+      emoji = '📚';
+      sub = 'Читайте больше, и всё получится!';
+    }
+    finalTitle.textContent = title;
+    finalEmoji.textContent = emoji;
+    finalSub.textContent = sub;
+    stopMusic();
+  }
+
+  // ============================================================
+  // 5. УПРАВЛЕНИЕ ЗВУКОМ
+  // ============================================================
+  let musicEnabled = true;
+  let sfxEnabled = true;
+
+  document.getElementById('musicToggle').addEventListener('click', function() {
+    musicEnabled = !musicEnabled;
+    this.classList.toggle('off');
+    if (musicEnabled) startMusic();
+    else stopMusic();
+  });
+  document.getElementById('sfxToggle').addEventListener('click', function() {
+    sfxEnabled = !sfxEnabled;
+    this.classList.toggle('off');
+  });
+
+  document.addEventListener('click', () => {
+    initAudio();
+    if (musicEnabled) startMusic();
+  }, { once: true });
+
+  // ============================================================
+  // 6. ПЕРЕЗАПУСК
+  // ============================================================
+  restartBtn.addEventListener('click', () => {
+    finalScreen.style.display = 'none';
+    gameTable.style.display = 'flex';
+    initGame();
+    if (musicEnabled) startMusic();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (confirm('Сбросить прогресс и начать заново?')) {
+      localStorage.removeItem('veriu_ne_veriu_game');
+      location.reload();
+    }
+  });
+
+  // ============================================================
+  // 7. СТАРТ
+  // ============================================================
+  if (typeof questions !== 'undefined' && questions.length) {
+    initGame();
+  } else {
+    alert('Не удалось загрузить вопросы. Проверьте файл data.js.');
+  }
+</script>
+</body>
+</html>
